@@ -1,9 +1,3 @@
-import javax.lang.model.util.ElementScanner14;
-
-/**
- * To get partial hex just take subset of bits in integer form and convert normal method to hex using Hex array
- */
-
 public class IP {
     
     public static int ip_data(byte[] arr){
