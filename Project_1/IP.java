@@ -1,3 +1,5 @@
+import javax.lang.model.util.ElementScanner14;
+
 /**
  * To get partial hex just take subset of bits in integer form and convert normal method to hex using Hex array
  */
@@ -15,34 +17,18 @@ public class IP {
         System.out.println("IP: \t Header Length = "+header_length + " bytes");
         
        
-        System.out.println("IP: \t Type of Service = 0x"+pktanalyzer.to_hex(arr[15]));
+        System.out.println("IP: \t DCN = 0x"+(pktanalyzer.to_hex((byte)pktanalyzer.get_extracted(arr[15] & 0xff,6,3))));
 
-        int priority_decimal = arr[15] & 0xff;
-        int precedence = (pktanalyzer.get_extracted(priority_decimal,3,6));
+
+        int ecn = (pktanalyzer.get_extracted(arr[15] & 0xff,2,1));
+        System.out.println("IP: \t ECN = 0x"+pktanalyzer.to_hex((byte)ecn));
         
-        String precendence_binary = "";
-        if((precedence & (1 << (8 - 1) )) > 0) precendence_binary += 1;
-        else precendence_binary += 0;
+        if ((((arr[15] & 0xff) & (1 << (1 - 1) )) > 0) && (((arr[15] & 0xff) & (1 << (2 - 1) )) > 0)) System.out.println("IP: \t \t .... ..11 = Congestion Encountered");
+        else if ((((arr[15] & 0xff) & (1 << (1 - 1) )) > 0) && !(((arr[15] & 0xff) & (1 << (2 - 1) )) > 0)) System.out.println("IP: \t \t .... ..10 = ECN Capable Transport , ECT(0)");
+        else if (!(((arr[15] & 0xff) & (1 << (1 - 1) )) > 0) && (((arr[15] & 0xff) & (1 << (2 - 1) )) > 0)) System.out.println("IP: \t \t .... ..01 = ECN Capable Transport , ECT(1)");
+        else System.out.println("IP: \t \t .... ..00 = Non ECN-Capable Transport, Non-ECT");
 
-        if((precedence & (1 << (7 - 1) )) > 0) precendence_binary += 1;
-        else precendence_binary += 0;
 
-        if((precedence & (1 << (6 - 1) )) > 0) precendence_binary += 1;
-        else precendence_binary += 0;
-
-        System.out.println("IP: \t\t "+precendence_binary+". .... = "+precedence+" (precedence)");
-
-        if ((priority_decimal & (1 << (5 - 1) )) > 0) System.out.println("IP: \t\t ...1 .... = Low Delay");
-        else System.out.println("IP: \t\t ...0 .... = Normal Delay");
-
-        if ((priority_decimal & (1 << (4 - 1) )) > 0) System.out.println("IP: \t\t .... 1... = High throughput");
-        else System.out.println("IP: \t\t .... 0... = Normal throughput");
-
-        if ((priority_decimal & (1 << (3 - 1) )) > 0) System.out.println("IP: \t\t .... .1.. = High Reliability");
-        else System.out.println("IP: \t\t .... .0.. = Normal reliability");
-
-        if ((priority_decimal & (1 << (2 - 1) )) > 0) System.out.println("IP: \t\t .... ..1. = Minimize monetary cost");
-        else System.out.println("IP: \t\t .... ..0. = Normal monetary cost");
 
         int total_length = Integer.parseInt(pktanalyzer.to_hex(arr[16] )+pktanalyzer.to_hex(arr[17] ), 16);
         System.out.println("IP: \t Total length = "+total_length+" bytes");
@@ -75,8 +61,8 @@ public class IP {
 
         String header_checksum = "";
         for(int i = 24 ; i<= 25 ;i++){
-            header_checksum += pktanalyzer.Hex[(0xF0 & arr[i]) >>> 4];
-            header_checksum  += pktanalyzer.Hex[(0x0F & arr[i])];
+            header_checksum += pktanalyzer.to_hex(arr[i]);
+            
         }
         System.out.println("IP: \t Header Checksum = 0x"+header_checksum);
 
@@ -84,13 +70,13 @@ public class IP {
         for(int i = 26 ; i<= 29 ;i++){
             src_address += (arr[i] & 0xff) +".";
         }
-        System.out.println("IP: \t Source Address = "+src_address);
+        System.out.println("IP: \t Source Address = "+src_address.substring(0,src_address.length()-1));
 
         String dest_address = "";
         for(int i = 30 ; i<= 33 ;i++){
             dest_address += (arr[i] & 0xff) +".";
         }
-        System.out.println("IP: \t Destination Address = "+dest_address);
+        System.out.println("IP: \t Destination Address = "+dest_address.substring(0,dest_address.length()-1));
 
         if(header_length > 20) System.out.println("IP: \t Options Present = Yes");
         else System.out.println("IP: \t No options");

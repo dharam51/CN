@@ -62,30 +62,34 @@ public class tcp {
         
         int iteration = 0;
         String d = "";
+        String ch = "";
 
         int index = start_index+data_offset*4;
 
         while(index <= Math.min(arr.length - 1 ,  64+(start_index+data_offset*4))){
             iteration ++;
-            d += pktanalyzer.to_hex(arr[index]);
+            d += pktanalyzer.to_hex(arr[index]); 
+            int xx = arr[index] & 0xff;
+            if (xx >= 33 && xx <= 126) ch += (char) xx;
+            else ch += ".";
+            if(index == arr.length)  {
+                System.out.println("UDP: \t "+d+"\t \t '"+ch+"'"); 
+                break;
+            }
             index ++;
             d += pktanalyzer.to_hex(arr[index]);
+            xx = arr[index] & 0xff;
+            if (xx >= 33 && xx <= 126) ch += (char) xx;
+            else ch += ".";
             d += " ";
-            if (iteration == 8){
-                System.out.println("TCP: \t "+d);
+            if (iteration == 8){ 
+                System.out.println("TCP: \t "+d+"\t \t '"+ch+"'"); 
                 d = "";
                 iteration = 0;
+                ch = "";
             }
             index++;
         }
-
-        
-
-        //System.out.println(pktanalyzer.to_hex(arr[start_index+data_offset*4]));
-
-        //11001101 01010110
-        //11001101 1010110
-
     }
     
 }

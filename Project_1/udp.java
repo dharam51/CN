@@ -19,22 +19,30 @@ public class udp {
 
         int iteration = 0;
         String d = "";
+        String ch = "";
 
         int index = start_index+8;
         
         while(index <= Math.min(arr.length - 1 ,  64 + start_index+8)){
             iteration ++;
             d += pktanalyzer.to_hex(arr[index]);
+            int xx = arr[index] & 0xff;
+            if (xx >= 33 && xx <= 126) ch += (char) xx;
+            else ch += ".";
             index ++;
             if(index == arr.length)  {
-                System.out.println("UDP: \t "+d); 
+                System.out.println("UDP: \t "+d+"\t \t '"+ch+"'"); 
                 break;
             }
             d += pktanalyzer.to_hex(arr[index]);
+            xx = arr[index] & 0xff;
+            if (xx >= 33 && xx <= 126) ch += (char) xx;
+            else ch += ".";
             d += " ";
             if (iteration == 8){
-                System.out.println("UDP: \t "+d);
+                System.out.println("UDP: \t "+d+"\t \t '"+ch+"'");
                 d = "";
+                ch = "";
                 iteration = 0;
             }
             index++;

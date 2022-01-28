@@ -1,0 +1,8 @@
+//https://mkyong.com/java/java-how-to-convert-bytes-to-hex/
+//https://stackoverflow.com/questions/16770742/convert-byte-array-to-decimal
+//int x = Integer.parseInt("7eec",16);  
+//https://www.hudatutorials.com/java/basics/java-arrays/java-byte-array
+//https://stackoverflow.com/questions/46383382/java-how-to-extract-certain-portions-of-bits-using-bit-mask
+//https://stackoverflow.com/questions/6090561/how-to-use-high-and-low-bytes
+//https://stackoverflow.com/questions/8408918/extracting-bits-with-bitwise-operators ==> IMP
+//https://www.oreilly.com/library/view/c-cookbook/0596003390/ch01s06.html
