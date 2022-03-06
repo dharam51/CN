@@ -17,6 +17,7 @@ public class process_receive_update extends Thread{
             byte[] receive_data = new byte[504];
             DatagramPacket incomingPacket = new DatagramPacket(receive_data, receive_data.length);
             socket.receive(incomingPacket);
+            process_receive_bytes process = new process_receive_bytes(incomingPacket).start();
 
 
         }
