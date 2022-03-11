@@ -1,5 +1,7 @@
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.*;
+import java.net.*;
 
 public class send_update extends Thread {
     
@@ -9,9 +11,12 @@ public class send_update extends Thread {
     public void run(){
 
         while(true){
-        
-            send_broadcast(RIPPacket.cmd_response);
-            Thread.sleep(send_update.broadcast_interval*1000);
+            try{
+                send_broadcast(RIPPacket.cmd_response);
+                Thread.sleep(send_update.broadcast_interval*1000);
+            } catch (Exception e){
+                System.out.println("Excpetion occured in send_update.java "+e);
+            }
         }
 
         
@@ -30,18 +35,19 @@ public class send_update extends Thread {
            
             byte[] data_to_send = myRIP.form_rip_packet();
 
-            DatagramSocket mySocket = new DatagramSocket();
-            InetAddress grp = null;
             try {
+                DatagramSocket mySocket = new DatagramSocket();
+                InetAddress grp = null;
                 grp = InetAddress.getByName(StartRover.multicast_ip);
-            } catch (UnknownHostException e) {
+            
+
+                Integer port = StartRover.port;
+
+                DatagramPacket packet = new DatagramPacket(data_to_send , data_to_send.length, grp, port);
+                mySocket.send(packet);
+            } catch (Exception e) {
                 System.out.println("Exception Occured in send_update class "+e);
             }
-
-            Integer port = StartRover.port;
-
-            DatagramPacket packet = new DatagramPacket(data_to_send , data_to_send.length, grp, port);
-            mySocket.send(packet);
 
     }
 

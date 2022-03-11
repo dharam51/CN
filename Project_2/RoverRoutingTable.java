@@ -27,7 +27,7 @@ public class RoverRoutingTable {
         return this.next_hop;
     }
 
-    public String get_metrics(){
+    public int get_metrics(){
         return this.metrics;
     }
 

@@ -1,4 +1,5 @@
 import java.time.*;
+import java.util.*;
 
 public class is_rover_dead extends Thread {
     
@@ -18,6 +19,7 @@ public class is_rover_dead extends Thread {
                     for(RoverRoutingTable each_entry : StartRover.rrt){
                         if(each_entry.get_next_hop().equalsIgnoreCase(next_hop_ip)){
                             each_entry.update_metrics(RIPPacket.unreachable);
+
                             //send update that rover is dead
                             StartRover.send_my_update.send_broadcast(RIPPacket.cmd_response);
 

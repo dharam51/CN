@@ -8,11 +8,11 @@ public class RIPPacket {
     public static int cmd_response = 2;
     public static int unreachable = 16;
 
-    String command ; 
+    int command ; 
     ArrayList<RoverRoutingTable> rrt = new ArrayList<>();
     String sender;
 
-    public RIPPacket(String command , ArrayList<RoverRoutingTable> rrt, String sender){
+    public RIPPacket(int command , ArrayList<RoverRoutingTable> rrt, String sender){
 
         this.command = command;
         this.rrt = rrt;
@@ -25,64 +25,64 @@ public class RIPPacket {
 
     }
 
-    public RoverRoutingTable get_rrt(){
+    public ArrayList<RoverRoutingTable> get_rrt(){
         return this.rrt;
     }
 
-    public String get_sender_ip(String sender){
+    public static String get_sender_ip(String sender){
         return "10.0."+sender+".0";
     }
 
     public byte[] form_rip_packet(){
-        byte[] data = new byte[(rrt.size()*20) + 4];
+        byte[] arr = new byte[(rrt.size()*20) + 4];
         int i = 0;
-        if(command.equalsIgnoreCase(RIPPacket.cmd_request)){
-            byte b = (byte)Integer.parseInt(RIPPacket.cmd_request);
+        if(command == (RIPPacket.cmd_request)){
+            byte b = (byte)RIPPacket.cmd_request;
             arr[i++] = b;
         }
         else{
-            byte b = (byte)Integer.parseInt(RIPPacket.cmd_response);
+            byte b = (byte)RIPPacket.cmd_response;
             arr[i++] = b;
         }
-        arr[i++] = (byte)Integer.parseInt(RIPPacket.rip_version);
+        arr[i++] = (byte)RIPPacket.rip_version;
         arr[i++] = (byte)Integer.parseInt(sender);
-        arr[i++] = (byte)Integer.parseInt(RIPPacket.unused);
+        arr[i++] = (byte)RIPPacket.unused;
 
-        if(command.equalsIgnoreCase(RIPPacket.cmd_response))  {
+        if(command == (RIPPacket.cmd_response))  {
 
             for(int j = 0 ; j < rrt.size() ; j ++){
                 RoverRoutingTable mycurrentrrt = rrt.get(j);
                 int address_family_identified = mycurrentrrt.address_family_identified;
-                byte low = (byte) address_family_identified >> 8;
-                byte high = (byte) address_family_identified;
+                byte low = (byte) (address_family_identified >> 8);
+                byte high = (byte) (address_family_identified);
                 arr[i++] = low;
                 arr[i++] = high;
 
                 int route_tag = mycurrentrrt.route_tag;
-                low = (byte) route_tag >> 8;
+                low = (byte) (route_tag >> 8);
                 high = (byte) route_tag;
                 arr[i++] = low;
                 arr[i++] = high;
 
-                String destination_ip = mycurrentrrt.get_destination_ip;
+                String destination_ip = mycurrentrrt.get_destination_ip();
                 String[] s = destination_ip.split("\\.");
                 for(int x = 0; x < 4; x++)  {
-                    arr[i++] = Integer.parseInt(s[x]);
+                    arr[i++] = (byte) (Integer.parseInt(s[x],10));
                 }
 
                 String subnet_mask = mycurrentrrt.subnet_mask;
                 s = subnet_mask.split("\\.");
                 for(int x = 0; x < 4; x++)  {
-                    arr[i++] = Integer.parseInt(s[x]);
+                    arr[i++] =(byte) (Integer.parseInt(s[x],10));
                 }
 
-                String next_hop = mycurrentrrt.get_next_hop;
+                String next_hop = mycurrentrrt.get_next_hop();
                 s = next_hop.split("\\.");
                 for(int x = 0; x < 4; x++)  {
-                    arr[i++] = Integer.parseInt(s[x]);
+                    arr[i++] = (byte) (Integer.parseInt(s[x],10));
                 }
 
-                int metrics = mycurrentrrt.get_metrics;
+                int metrics = mycurrentrrt.get_metrics();
                 byte[] byteEquivalent = new byte[4];
                 byteEquivalent[0] = (byte) (metrics >> 24);
                 byteEquivalent[1] = (byte) (metrics >> 16);
@@ -95,7 +95,7 @@ public class RIPPacket {
             }
 
         }
-        return data;
+        return arr;
 
     }
 

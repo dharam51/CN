@@ -15,7 +15,7 @@ public class test {
         try{
            
             Duration duration = Duration.between(map.get("1"), LocalDateTime.now());
-            int minu = duration.toMinutes();
+            long minu = duration.toMinutes();
             System.out.println(minu);
         } catch(Exception e){
             System.out.println(e);

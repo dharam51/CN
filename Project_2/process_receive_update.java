@@ -13,23 +13,25 @@ public class process_receive_update extends Thread{
     @Override
     public void run(){
         while(true){
-
-            byte[] receive_data = new byte[504];
-            DatagramPacket incomingPacket = new DatagramPacket(receive_data, receive_data.length);
-            socket.receive(incomingPacket);
-            process_receive_bytes process = new process_receive_bytes(incomingPacket).start();
-
-
+            try{
+                byte[] receive_data = new byte[504];
+                DatagramPacket incomingPacket = new DatagramPacket(receive_data, receive_data.length);
+                socket.receive(incomingPacket);
+                process_receive_bytes process = new process_receive_bytes(incomingPacket);
+                process.start();
+            } catch (Exception e) {
+                System.out.println("Exception Occured in process_receive_update class "+e);
+            }
         }
     }
     
 }
 
 
-public class process_receive_bytes extends Thread{
+class process_receive_bytes extends Thread{
 
     DatagramPacket packet;
-
+    public static final char[] Hex = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9','a', 'b', 'c', 'd', 'e', 'f' }; 
     public process_receive_bytes(DatagramPacket dp){
         this.packet = dp;
     }
@@ -38,7 +40,7 @@ public class process_receive_bytes extends Thread{
     public void run(){
 
         byte[] data = packet.getData();
-        String sender_id = String.valueOf(Integer.parseInt(data[2] ,16));
+        String sender_id = String.valueOf(Integer.parseInt(to_hex(data[2]) ,16));
 
         /**
         To Implement :
@@ -47,7 +49,7 @@ public class process_receive_bytes extends Thread{
         **/
 
         /** 1 */
-        if(StartRover.rover_id == sender_id ){
+        if(StartRover.rover_id.equalsIgnoreCase(sender_id)){
             return;
         }
 
@@ -59,12 +61,12 @@ public class process_receive_bytes extends Thread{
         ArrayList<RoverRoutingTable> temp_rrt = new ArrayList<>();
         while(i < data.length){
 
-            int address_family_identified = Integer.parseInt(to_hex(data[i])+ to_hex(data(++i)), 16);
-            int route_tag = Integer.parseInt(to_hex(data[++i])+ to_hex(data(++i)), 16);
+            int address_family_identified = Integer.parseInt(to_hex(data[i])+ to_hex(data[++i]), 16);
+            int route_tag = Integer.parseInt(to_hex(data[++i])+ to_hex(data[++i]), 16);
             String ip_address = Long.parseLong(to_hex(data[++i]) ,16) + "."+ Long.parseLong(to_hex(data[++i]) ,16) + "." + Long.parseLong(to_hex(data[++i]) ,16) + "."+ Long.parseLong(to_hex(data[++i]) ,16);
             String subnet  = Long.parseLong(to_hex(data[++i]) ,16) + "."+ Long.parseLong(to_hex(data[++i]) ,16) + "." + Long.parseLong(to_hex(data[++i]) ,16) + "."+ Long.parseLong(to_hex(data[++i]) ,16);
             String next_hop = Long.parseLong(to_hex(data[++i]) ,16) + "."+ Long.parseLong(to_hex(data[++i]) ,16) + "." + Long.parseLong(to_hex(data[++i]) ,16) + "."+ Long.parseLong(to_hex(data[++i]) ,16);
-            int metrics = Integer.parseInt( to_hex(data[++i]) + Integer.parseInt(data[++i]) + Integer.parseInt(data[++i]) + Integer.parseInt(data[++i]) ,16 );
+            int metrics = Integer.parseInt( to_hex(data[++i]) + to_hex(data[++i]) + to_hex(data[++i]) + to_hex(data[++i]) ,16 );
             i++;
             if(address_family_identified == 0 && 
                     route_tag == 0 &&
@@ -93,10 +95,10 @@ public class process_receive_bytes extends Thread{
         
         for(RoverRoutingTable each_rrt : StartRover.rrt){
 
-            if(each_rrt.get_destination_ip.equalsIgnoreCase(sender_ip)){
+            if(each_rrt.get_destination_ip().equalsIgnoreCase(sender_ip)){
                 is_sender_present = true;
-                StartRover.rrt.update_next_hop(sender_ip);
-                StartRover.rrt.update_metrics(1);
+                each_rrt.update_next_hop(sender_ip);
+                each_rrt.update_metrics(1);
 
             }
 
@@ -113,11 +115,11 @@ public class process_receive_bytes extends Thread{
             boolean did_address_matched = false;
             for(RoverRoutingTable each_entry_current : StartRover.rrt){
 
-                if(each_entry_new.get_destination_ip.equalsIgnoreCase(each_entry_current.destination_ip)){
+                if(each_entry_new.get_destination_ip().equalsIgnoreCase(each_entry_current.get_destination_ip())){
                     
                     did_address_matched = true;
 
-                    if(each_entry_current.get_next_hop.equalsIgnoreCase(sender_ip)){
+                    if(each_entry_current.get_next_hop().equalsIgnoreCase(sender_ip)){
 
                         if(1 + each_entry_new.get_metrics() >= RIPPacket.unreachable){
 
@@ -129,7 +131,7 @@ public class process_receive_bytes extends Thread{
 
                     } else{
 
-                        if(1+ each_entry_new.get_metrics() < each_entry_current.get_metrics){
+                        if(1+ each_entry_new.get_metrics() < each_entry_current.get_metrics()){
 
                             each_entry_current.update_metrics(1 + each_entry_new.get_metrics());
                             each_entry_current.update_next_hop(sender_ip);
