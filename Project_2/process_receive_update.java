@@ -42,10 +42,15 @@ class process_receive_bytes extends Thread{
         byte[] data = packet.getData();
         String sender_id = String.valueOf(Integer.parseInt(to_hex(data[2]) ,16));
 
+        int type =  data[0] & 0xff;
+
+        
+
         /**
         To Implement :
         1. if sender is itself do not do anything just return 
-        2. update time corresponds to sender's ip in RoverStatus
+        2. if its request from another rover send my rrt table as response
+        3. update time corresponds to sender's ip in RoverStatus
         **/
 
         /** 1 */
@@ -54,7 +59,14 @@ class process_receive_bytes extends Thread{
         }
 
         /** 2 */
+        if(type == RIPPacket.cmd_request){
+            StartRover.send_my_update.send_broadcast(RIPPacket.cmd_response);
+            return;
+        }
+
+        /** 3 */
         StartRover.rover_status.update_time(RIPPacket.get_sender_ip(sender_id));
+
         
         int index = 4;
         int i = index;
@@ -68,13 +80,9 @@ class process_receive_bytes extends Thread{
             String next_hop = Long.parseLong(to_hex(data[++i]) ,16) + "."+ Long.parseLong(to_hex(data[++i]) ,16) + "." + Long.parseLong(to_hex(data[++i]) ,16) + "."+ Long.parseLong(to_hex(data[++i]) ,16);
             int metrics = Integer.parseInt( to_hex(data[++i]) + to_hex(data[++i]) + to_hex(data[++i]) + to_hex(data[++i]) ,16 );
             i++;
-            if(address_family_identified == 0 && 
-                    route_tag == 0 &&
-                    ip_address.equalsIgnoreCase("0.0.0.0") &&
-                    subnet.equalsIgnoreCase("0.0.0.0") && 
-                    next_hop .equalsIgnoreCase("0.0.0.0") ) {
-                        break;
-                    }
+            if(address_family_identified == 0 &&  route_tag == 0 && ip_address.equalsIgnoreCase("0.0.0.0") && subnet.equalsIgnoreCase("0.0.0.0") &&  next_hop .equalsIgnoreCase("0.0.0.0") ) {     
+                break; 
+            }
             
             temp_rrt.add(new RoverRoutingTable(ip_address , next_hop , metrics));
 
@@ -92,20 +100,25 @@ class process_receive_bytes extends Thread{
 
         String sender_ip = RIPPacket.get_sender_ip(sender_id);
         boolean is_sender_present = false;
+        boolean is_table_changed = false;
+
         
+
         for(RoverRoutingTable each_rrt : StartRover.rrt){
 
             if(each_rrt.get_destination_ip().equalsIgnoreCase(sender_ip)){
                 is_sender_present = true;
                 each_rrt.update_next_hop(sender_ip);
-                each_rrt.update_metrics(1);
-
+                if(each_rrt.get_metrics() != 1){
+                    each_rrt.update_metrics(1);
+                    is_table_changed = true;
+                }
             }
 
         }
 
         if(StartRover.rrt.size() == 0 || !is_sender_present ){
-
+            is_table_changed = true;
             StartRover.rrt.add(new RoverRoutingTable( sender_ip , sender_ip , 1));
 
         }
@@ -128,13 +141,18 @@ class process_receive_bytes extends Thread{
                         } else{
                             each_entry_current.update_metrics(1 + each_entry_new.get_metrics());
                         }
+                        is_table_changed = true;
 
                     } else{
 
-                        if(1+ each_entry_new.get_metrics() < each_entry_current.get_metrics()){
+                        if(each_entry_new.get_metrics() >= RIPPacket.unreachable){
+                            each_entry_current.update_metrics(RIPPacket.unreachable);
+                        }
+                        else if(1+ each_entry_new.get_metrics() < each_entry_current.get_metrics()){
 
                             each_entry_current.update_metrics(1 + each_entry_new.get_metrics());
                             each_entry_current.update_next_hop(sender_ip);
+                            is_table_changed = true;
 
                         }
 
@@ -145,14 +163,20 @@ class process_receive_bytes extends Thread{
             }
 
             if(!did_address_matched && !RIPPacket.get_sender_ip(StartRover.rover_id).equalsIgnoreCase(sender_ip)){
-
+                is_table_changed = true;
                 StartRover.rrt.add(new RoverRoutingTable (
                     each_entry_new.get_destination_ip(),
                     sender_ip,
-                    each_entry_new.get_metrics()));
+                    1 + each_entry_new.get_metrics()));
 
             }
 
+        }
+
+        //print routing table
+        
+        if(is_table_changed){
+            RoverRoutingTable.print();
         }
 
     }

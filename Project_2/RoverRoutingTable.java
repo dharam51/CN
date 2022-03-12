@@ -39,4 +39,13 @@ public class RoverRoutingTable {
         this.metrics = updated_metrics;
     }
 
+    public static void print(){
+        System.out.println("###########################################################");
+        System.out.println("Source IP ::: Next Hop ::: Destination ::: Cost ");
+        for(RoverRoutingTable each_rrt : StartRover.rrt){
+            System.out.println(RIPPacket.get_sender_ip(StartRover.rover_id)+ " ::: "+each_rrt.get_next_hop()+" ::: "+each_rrt.get_destination_ip()+" ::: "+each_rrt.get_metrics());
+        }
+        System.out.println("###########################################################");
+    }
+
 }

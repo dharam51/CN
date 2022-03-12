@@ -27,6 +27,9 @@ public class StartRover {
             MulticastSocket rover_socket = new MulticastSocket(port);
             rover_socket.joinGroup(InetAddress.getByName(multicast_ip));
 
+            //initialise cost to itself as zero
+            rrt.add(new RoverRoutingTable(RIPPacket.get_sender_ip(rover_id) , RIPPacket.get_sender_ip(rover_id) , 0));
+
             //Initialise timeout process table hashmap
             rover_status = new RoverStatus(new LinkedHashMap<String, LocalDateTime>());
 
@@ -42,6 +45,8 @@ public class StartRover {
 
             //send Request packet
             send_my_update.send_broadcast(RIPPacket.cmd_request);
+
+            
         } catch(Exception e){
             System.out.println("Exception Occured in StartRover.java "+e);
         }

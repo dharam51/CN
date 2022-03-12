@@ -45,6 +45,7 @@ public class send_update extends Thread {
 
                 DatagramPacket packet = new DatagramPacket(data_to_send , data_to_send.length, grp, port);
                 mySocket.send(packet);
+
             } catch (Exception e) {
                 System.out.println("Exception Occured in send_update class "+e);
             }

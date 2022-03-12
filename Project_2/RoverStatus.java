@@ -12,14 +12,13 @@ public class RoverStatus{
         this.time_table = time_table;
     }
 
-    public LinkedHashMap get_time_table(){
+    public LinkedHashMap<String, LocalDateTime> get_time_table(){
         return this.time_table;
     }
 
  
     public void update_time(String source_ip){
-        
-        time_table.put(source_ip,LocalDateTime.now());
+        this.time_table.put(source_ip,LocalDateTime.now());
 
     }
 
