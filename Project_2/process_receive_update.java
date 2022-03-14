@@ -112,6 +112,7 @@ class process_receive_bytes extends Thread{
                 if(each_rrt.get_metrics() != 1){
                     each_rrt.update_metrics(1);
                     is_table_changed = true;
+                    
                 }
             }
 
@@ -120,7 +121,7 @@ class process_receive_bytes extends Thread{
         if(StartRover.rrt.size() == 0 || !is_sender_present ){
             is_table_changed = true;
             StartRover.rrt.add(new RoverRoutingTable( sender_ip , sender_ip , 1));
-
+           
         }
 
         for(RoverRoutingTable each_entry_new : new_rrt){
@@ -132,7 +133,7 @@ class process_receive_bytes extends Thread{
                     
                     did_address_matched = true;
 
-                    if(each_entry_current.get_next_hop().equalsIgnoreCase(sender_ip)){
+                    if(each_entry_current.get_next_hop().equalsIgnoreCase(sender_ip) && 1 + each_entry_new.get_metrics() != each_entry_current.get_metrics() ){
 
                         if(1 + each_entry_new.get_metrics() >= RIPPacket.unreachable){
 
@@ -142,6 +143,7 @@ class process_receive_bytes extends Thread{
                             each_entry_current.update_metrics(1 + each_entry_new.get_metrics());
                         }
                         is_table_changed = true;
+                       
 
                     } else{
 
@@ -164,11 +166,8 @@ class process_receive_bytes extends Thread{
 
             if(!did_address_matched && !RIPPacket.get_sender_ip(StartRover.rover_id).equalsIgnoreCase(sender_ip)){
                 is_table_changed = true;
-                StartRover.rrt.add(new RoverRoutingTable (
-                    each_entry_new.get_destination_ip(),
-                    sender_ip,
-                    1 + each_entry_new.get_metrics()));
-
+                StartRover.rrt.add(new RoverRoutingTable (each_entry_new.get_destination_ip(),sender_ip,1 + each_entry_new.get_metrics()));
+                System.out.println("Here 5");
             }
 
         }
