@@ -12,7 +12,7 @@ public class send_update extends Thread {
 
         while(true){
             try{
-                send_broadcast(RIPPacket.cmd_response);
+                send_broadcast(rip_packet.cmd_response);
                 Thread.sleep(send_update.broadcast_interval*1000);
             } catch (Exception e){
                 System.out.println("Excpetion occured in send_update.java "+e);
@@ -24,13 +24,13 @@ public class send_update extends Thread {
 
     public void send_broadcast(int type){
 
-            RIPPacket myRIP;
+            rip_packet myRIP;
 
-            if(type == RIPPacket.cmd_response){
-                myRIP = new RIPPacket(RIPPacket.cmd_response  , StartRover.rrt , StartRover.rover_id);
+            if(type == rip_packet.cmd_response){
+                myRIP = new rip_packet(rip_packet.cmd_response  , start_rover.rrt , start_rover.rover_id);
             }
             else{
-                myRIP = new RIPPacket(RIPPacket.cmd_request  , StartRover.rrt , StartRover.rover_id);
+                myRIP = new rip_packet(rip_packet.cmd_request  , start_rover.rrt , start_rover.rover_id);
             }
            
             byte[] data_to_send = myRIP.form_rip_packet();
@@ -38,10 +38,10 @@ public class send_update extends Thread {
             try {
                 DatagramSocket mySocket = new DatagramSocket();
                 InetAddress grp = null;
-                grp = InetAddress.getByName(StartRover.multicast_ip);
+                grp = InetAddress.getByName(start_rover.multicast_ip);
             
 
-                Integer port = StartRover.port;
+                Integer port = start_rover.port;
 
                 DatagramPacket packet = new DatagramPacket(data_to_send , data_to_send.length, grp, port);
                 mySocket.send(packet);
