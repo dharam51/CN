@@ -1,3 +1,7 @@
+/**
+ * Author : @Dharmendra Rasikbhai Nasit
+ * This file will process the receive packet from neighbor
+ */
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
 import java.util.ArrayList;
@@ -86,7 +90,6 @@ class process_receive_bytes extends Thread{
             if(address_family_identified == 0 &&  route_tag == 0 && ip_address.equalsIgnoreCase("0.0.0.0") && subnet.equalsIgnoreCase("0.0.0.0") &&  next_hop .equalsIgnoreCase("0.0.0.0") ) {     
                 break; 
             }
-            
             temp_rrt.add(new rover_routing_table(ip_address , next_hop , metrics));
 
         }
@@ -157,7 +160,7 @@ class process_receive_bytes extends Thread{
                 start_rover.rrt.add(new rover_routing_table (each_entry_new.get_destination_ip(),sender_ip,new_cost));  
             }
         }
-        //print routing table
+        //print routing table if changed
         if(is_table_changed){
             rover_routing_table.print();
         }

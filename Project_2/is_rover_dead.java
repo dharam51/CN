@@ -34,8 +34,6 @@ public class is_rover_dead extends Thread {
                 if(difference_seconds > 10){
                     for(rover_routing_table each_entry : start_rover.rrt){
                         if(each_entry.get_next_hop().equalsIgnoreCase(next_hop_ip)){
-                            System.out.println("Rover "+next_hop_ip+" is unreachable !!");
-
                             each_entry.update_metrics(rip_packet.unreachable);
                             
                             rover_routing_table.print();

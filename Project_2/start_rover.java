@@ -1,3 +1,9 @@
+/**
+ * Author : @Dharmendra Rasikbhai Nasit (drn1263)
+ * This file will start the rover and start all the threads
+ * 
+ */
+
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.time.LocalDateTime;
@@ -8,7 +14,7 @@ import java.util.concurrent.*;
 public class start_rover {
 
     public static String multicast_ip = "224.0.0.9";
-    public static int port ;
+    public static int port = 6659;
     public static String rover_id ; 
 
     public static ArrayList<rover_routing_table> rrt = new ArrayList<>();
@@ -21,7 +27,6 @@ public class start_rover {
     public static void main(String[] args) {
 
         rover_id = args[0];
-        port = Integer.parseInt(args[1]);
 
         try{
             InetAddress group = InetAddress.getByName(multicast_ip);

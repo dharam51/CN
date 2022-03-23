@@ -1,3 +1,8 @@
+/**
+ * Author : @Dharmendra Nasit
+ * This file will maintain rover routing table getters and setters
+ * 
+ */
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
@@ -41,9 +46,9 @@ public class rover_routing_table {
 
     public static void print(){
         System.out.println("###########################################################");
-        System.out.println("Source IP ::: Next Hop ::: Destination ::: Cost ");
+        System.out.println("Destination ::: Next Hop  ::: Cost ");
         for(rover_routing_table each_rrt : start_rover.rrt){
-            System.out.println(rip_packet.get_sender_ip(start_rover.rover_id)+ " ::: "+each_rrt.get_next_hop()+" ::: "+each_rrt.get_destination_ip()+" ::: "+each_rrt.get_metrics());
+            System.out.println(each_rrt.get_destination_ip()+ "/24 ::: "+each_rrt.get_next_hop()+" ::: "+each_rrt.get_metrics());
         }
         System.out.println("###########################################################");
     }

@@ -1,3 +1,7 @@
+/**
+ * Author : @Dharmendra Nasit
+ * This file will broadcast update every 5sec
+ */
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.*;

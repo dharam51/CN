@@ -1,3 +1,9 @@
+/**
+ * Author  : @Dharmendra Nasit (drn1263)
+ * This file is responsible to genereate rip packet
+ * 
+ */
+
 import java.util.ArrayList;
 
 public class rip_packet {
@@ -83,12 +89,12 @@ public class rip_packet {
                 }
 
                 int metrics = mycurrentrrt.get_metrics();
-                byte[] byteEquivalent = new byte[4];
-                byteEquivalent[0] = (byte) (metrics >> 24);
-                byteEquivalent[1] = (byte) (metrics >> 16);
-                byteEquivalent[2] = (byte) (metrics >> 8);
-                byteEquivalent[3] = (byte) (metrics);
-                for (byte b : byteEquivalent) {
+                byte[] bytearr = new byte[4];
+                bytearr[0] = (byte) (metrics >> 24);
+                bytearr[1] = (byte) (metrics >> 16);
+                bytearr[2] = (byte) (metrics >> 8);
+                bytearr[3] = (byte) (metrics);
+                for (byte b : bytearr) {
                     arr[i++] = b;
                 }
 
